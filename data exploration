@@ -1,0 +1,53 @@
+# Install necessary libraries
+!pip install matplotlib seaborn
+
+# Import libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load preprocessed data
+ticker = "AAPL"
+stock_data = pd.read_csv(f'{ticker}_preprocessed_data.csv', parse_dates=True, index_col=0)  # Use index_col=0 to set the first column as the index
+
+# Display the first few rows of the dataset
+print("Preprocessed Stock Data Head:")
+print(stock_data.head())
+
+# Step 1: Plot stock price trends
+plt.figure(figsize=(12, 6))
+plt.plot(stock_data['Close'], label='Close Price', color='blue')
+plt.plot(stock_data['MA_50'], label='50-Day MA', color='orange')
+plt.plot(stock_data['MA_200'], label='200-Day MA', color='green')
+plt.title(f'{ticker} Stock Price and Moving Averages')
+plt.xlabel('Date')
+plt.ylabel('Price (USD)')
+plt.legend()
+plt.show()
+
+# Step 2: Plot trading volume
+plt.figure(figsize=(12, 6))
+plt.bar(range(len(stock_data)), stock_data['Volume'], color='purple', alpha=0.7)
+plt.title(f'{ticker} Trading Volume')
+plt.xlabel('Date')
+plt.ylabel('Volume')
+plt.xticks(range(len(stock_data)), stock_data.index.strftime('%Y-%m-%d'), rotation=90)  # Format x-axis dates
+plt.show()
+
+# Step 3: Correlation heatmap
+correlation_matrix = stock_data.corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Step 4: Statistical Analysis
+# Describe the dataset
+print("\nStatistical Summary:")
+print(stock_data.describe())
+
+# Check for outliers in the 'Close' price
+plt.figure(figsize=(8, 6))
+sns.boxplot(x=stock_data['Close'])
+plt.title('Boxplot of Close Price')
+plt.show()
