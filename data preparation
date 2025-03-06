@@ -1,0 +1,92 @@
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Step 1: Generate Synthetic Stock Market Data
+def generate_synthetic_stock_data(start_date, end_date):
+    """
+    Generate a synthetic stock market dataset with Open, High, Low, Close, and Volume.
+    """
+    # Generate date range
+    date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+    
+    # Generate synthetic stock prices
+    np.random.seed(42)  # For reproducibility
+    base_price = 100  # Starting price
+    prices = base_price + np.cumsum(np.random.randn(len(date_range)))  # Random walk for prices
+    
+    # Generate Open, High, Low, Close
+    open_prices = prices + np.random.randn(len(date_range)) * 2
+    high_prices = open_prices + np.abs(np.random.randn(len(date_range)) * 3)
+    low_prices = open_prices - np.abs(np.random.randn(len(date_range)) * 3)
+    close_prices = open_prices + np.random.randn(len(date_range)) * 2
+    
+    # Generate Volume
+    volume = np.random.randint(1000000, 5000000, size=len(date_range))
+    
+    # Create DataFrame
+    data = {
+        'Date': date_range,
+        'Open': open_prices,
+        'High': high_prices,
+        'Low': low_prices,
+        'Close': close_prices,
+        'Volume': volume
+    }
+    df = pd.DataFrame(data)
+    
+    # Add moving averages
+    df['MA_50'] = df['Close'].rolling(window=50).mean()
+    df['MA_200'] = df['Close'].rolling(window=200).mean()
+    
+    return df
+
+# Generate synthetic data
+start_date = '2020-01-01'
+end_date = '2023-01-01'
+stock_data = generate_synthetic_stock_data(start_date, end_date)
+
+# Display the first few rows of the dataset
+print("Synthetic Stock Data Head:")
+print(stock_data.head())
+
+# Step 2: Data Exploration
+# Plot stock price trends
+plt.figure(figsize=(12, 6))
+plt.plot(stock_data['Date'], stock_data['Close'], label='Close Price', color='blue')
+plt.plot(stock_data['Date'], stock_data['MA_50'], label='50-Day MA', color='orange')
+plt.plot(stock_data['Date'], stock_data['MA_200'], label='200-Day MA', color='green')
+plt.title('Synthetic Stock Price and Moving Averages')
+plt.xlabel('Date')
+plt.ylabel('Price (USD)')
+plt.legend()
+plt.show()
+
+# Plot trading volume
+plt.figure(figsize=(12, 6))
+plt.bar(stock_data['Date'], stock_data['Volume'], color='purple', alpha=0.7)
+plt.title('Synthetic Trading Volume')
+plt.xlabel('Date')
+plt.ylabel('Volume')
+plt.xticks(rotation=45)
+plt.show()
+
+# Correlation heatmap
+correlation_matrix = stock_data.corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Statistical Analysis
+# Describe the dataset
+print("\nStatistical Summary:")
+print(stock_data.describe())
+
+# Check for outliers in the 'Close' price
+plt.figure(figsize=(8, 6))
+sns.boxplot(x=stock_data['Close'])
+plt.title('Boxplot of Close Price')
+plt.show()
